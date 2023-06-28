@@ -1,0 +1,6 @@
+- qcacld-3.0: Optimization
+- Import gpu and some Q changes by Xiaomi
+- Use O3 optimisations by default
+- Fixed fast charging & enable usb fast charging
+- Introduce Simple Low Memory Killer
+- Fix memory leaks
