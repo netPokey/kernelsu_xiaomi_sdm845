@@ -36,6 +36,9 @@ jobs:
       run: |
         mkdir output
         make O=output  polaris_defconfig
+        
+    - name: Start KSU make
+      run: |
         cd output
         make O=output
 
