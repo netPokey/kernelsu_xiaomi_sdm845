@@ -36,6 +36,7 @@ jobs:
       run: |
         mkdir output
         make O=output  polaris_defconfig
+        cd output
         make O=output
 
     - name: Upload to Release‌‌...
