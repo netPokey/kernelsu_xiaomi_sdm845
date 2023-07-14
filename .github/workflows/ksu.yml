@@ -1,0 +1,49 @@
+name: Makefile CI
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Download Clang-aosp
+      run: |
+        git clone https://gitlab.com/crdroidandroid/android_prebuilts_clang_host_linux-x86_clang-r445002 --depth=1 --single-branch --no-tags -b 12.0 ~/clang
+        git clone https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9 -b android-10.0.0_r47 --depth=1 --single-branch --no-tags ~/aarch64-linux-android-4.9
+        git clone https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9 -b android-10.0.0_r47 --depth=1 --single-branch --no-tags ~/arm-linux-androideabi-4.9
+
+    - name:  Configuration Environment‌‌...
+      run: |
+        CLANG=~/clang/bin
+        GCC32=~/arm-linux-androideabi-4.9/bin
+        GCC64=~/aarch64-linux-android-4.9/bin
+        PATH=$CLANG:$GCC64:$GCC32:$PATH
+        export PATH
+        export ARCH=arm64
+        export CLANG_TRIPLE=aarch64-linux-gnu
+        export CROSS_COMPILE=aarch64-linux-android-
+        export CROSS_COMPILE_ARM32=arm-linux-androideabi-
+
+    - name: Start KSU building
+      run: |
+        mkdir output
+        make O=output  polaris_defconfig
+        
+    - name: Start KSU make
+      run: |
+        cd output
+        make O=output
+
+    - name: Upload to Release‌‌...
+      uses: actions/upload-artifact@v3
+      with:
+        name: dtbo-polaris-${{ env.BUILD_TIME }}
+        path: kernel_workspace/kernelsu_xiaomi_sdm845/output/arch/ARCH/boot/*
